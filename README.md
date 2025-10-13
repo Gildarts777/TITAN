@@ -1,141 +1,181 @@
-# TITAN — End‑to‑End Pipeline (ATT&CK STIX → Graph → Datasets → Train/Val/Test → Training & Test)
+# TITAN — Threat Intelligence Through Automated Navigation
 
-TITAN builds a MITRE ATT&CK knowledge graph from STIX bundles, generates QA/navigation datasets (CoT/NoCoT), creates **train/validation/test** splits, and provides training/testing scripts to fine‑tune and evaluate path‑generation models.
+TITAN is a **typed, bidirectional knowledge graph framework** for **Cyber Threat Intelligence (CTI)** reasoning and **question answering**.  
+It integrates data from the **MITRE ATT&CK STIX** bundles, builds a **TITAN Ontology**, generates **reasoning (CoT)** and **non-reasoning (NoCoT)** datasets, and provides an **end-to-end pipeline** for model training, evaluation, and graph execution.
 
 <p align="center">
-  <img src="images/TITAN.png" alt="TITAN framework" width="65%">
+  <img src="images/TITAN.png" alt="TITAN Framework" width="65%">
 </p>
 
-## Repository layout
+---
+
+## Overview
+
+TITAN implements the full pipeline described in the  paper *TITAN: Graph-Executable Reasoning for Cyber Threat Intelligence*.  
+It comprises:
+
+1. **Typed Graph Construction** — builds a **bidirectional knowledge graph** from MITRE ATT&CK STIX data using the TITAN Ontology, where each edge is semantically typed (e.g., `uses_attack_pattern`, `mitigates_attack_pattern`).
+2. **Dataset Generation** — creates large-scale QA/navigation datasets in both **CoT** and **NoCoT** formats, with executable relational paths (`<PATH>…</PATH>`).
+3. **Data Splitting** — produces train/validation/test splits across CTI sections.
+4. **Path-Planner Training** — fine-tunes LLMs for **path generation** using LoRA adapters (Unsloth + TRL).
+5. **Graph Execution** — executes generated paths over the TITAN Graph to return grounded entities and interpretable reasoning traces.
+
+---
+
+## Repository Structure
 ```
 TITAN/
 ├─ datasets/
 │  ├─ CoT/
 │  ├─ NoCoT/
-│  └─ create_dataset_splits.py          # split by section into train/val/test
+│  └─ create_dataset_splits.py          # split into train/val/test
 ├─ utils/
-│  ├─ build_graph.py                    # STIX → GraphML
-│  ├─ build_dataset.py                  # GraphML + YAML templates → dataset JSON (+ per-section JSON)
-│  ├─ paraphrase.py                     # optional LLM: target/objective improvement → target_variations.csv
-│  └─ useful_cot.yaml                   # question templates with <PATH>...</PATH> + target
-├─ graph_algorithm.py                   # graph navigation utilities
+│  ├─ build_graph.py                    # STIX → TITAN Ontology Graph (GraphML)
+│  ├─ build_dataset.py                  # Graph + YAML templates → dataset JSON
+│  ├─ paraphrase.py                     # optional: generate target variations via LLM
+│  └─ useful_cot.yaml                   # question templates with <PATH>...</PATH> and target
+├─ graph_algorithm.py                   # deterministic path execution utilities
 ├─ train_titan.py                       # LoRA SFT training (Unsloth + TRL)
-├─ test_titan.py                        # interactive tester (generate <PATH> and execute on graph)
-├─ modify_target.py                     # apply target_variations.csv to YAML/JSON
+├─ test_titan.py                        # interactive tester for path planning & execution
+├─ modify_target.py                     # apply paraphrased targets to YAML/JSON
 └─ README.md
 ```
 
-> Notes
-> - `paraphrase.py` is optional and **does not** affect the pipeline unless you apply its output via `modify_target.py`.
-> - If your image has a different filename, update the `<img src="images/...">` path accordingly.
+> Notes  
+> - `paraphrase.py` is optional and not used unless applied via `modify_target.py`.  
+> - Update the `<img src="images/...">` path if your image file name differs.
 
 ---
 
 ## Requirements
+
 - Python **3.9+**
 - Local MITRE **ATT&CK STIX** JSON bundles (e.g., `../attack-stix-data/`)
 - (Optional) GPU for LLM steps (`paraphrase.py`, training)
 
-### Install
+### Installation
 ```bash
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate           # Windows: .venv\Scripts\activate
 pip install -U pip
 
 pip install networkx pandas pyyaml tqdm scikit-learn
-# For training & testing:
+# For model training and testing:
 pip install torch transformers accelerate datasets trl unsloth
 ```
 
 ---
 
-## 1) Build the graph from STIX
-Script: `utils/build_graph.py` → outputs `stix_graph_correct.graphml` (repo root) and optional log.
+## 1. Build the TITAN Graph
+
+Script: `utils/build_graph.py`  
+Generates `titan_graph.graphml` (bidirectional, typed graph).
 
 ```bash
-python utils/build_graph.py   --base ../attack-stix-data   --out stix_graph_correct.graphml   --log-file mitre.txt
+python utils/build_graph.py --base ../attack-stix-data --out titan_graph.graphml --log-file build_log.txt
 ```
-> If your version of `build_graph.py` does not accept CLI args, set the paths inside the file or rely on defaults.
+
+> The resulting graph follows the **TITAN Ontology**, distinguishing semantic directions (e.g., `uses_attack_pattern` ↔ `used_by_intrusion_set`) and ensuring all relations are mirrored with coherent inverse semantics.
 
 ---
 
-## 2) Generate datasets (CoT or NoCoT)
+## 2. Generate CoT / NoCoT Datasets
+
 Script: `utils/build_dataset.py`  
 Inputs:
-- `stix_graph_correct.graphml` (from step 1)
-- `utils/useful_cot.yaml` (templates with `<PATH>...</PATH>` and `target`)
+- `titan_graph.graphml`
+- `utils/useful_cot.yaml` — templates with `<PATH>...</PATH>` and `target`
 
-Typical outputs (CoT):
-- `datasets/CoT/NAVIGATION_DATASET.json`  
-- `datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json`  
+Outputs:
+- `datasets/CoT/NAVIGATION_DATASET.json`
+- `datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json`
 
-Example (CoT):
+Example:
 ```bash
-python utils/build_dataset.py   --templates utils/useful_cot.yaml   --graph stix_graph_correct.graphml   --out datasets/CoT/NAVIGATION_DATASET.json   --out datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json
+python utils/build_dataset.py \
+  --templates utils/useful_cot.yaml \
+  --graph titan_graph.graphml \
+  --out datasets/CoT/NAVIGATION_DATASET.json \
+  --out datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json
 ```
 
-If you also want **NoCoT**, re-run with your NoCoT options and output paths in `datasets/NoCoT/` (if supported by your script).
+Re-run for **NoCoT** using the corresponding output folder:
+```
+datasets/NoCoT/
+```
 
-### (Optional) JSON → CSV helper
-Some steps prefer CSV. Convert with this one‑liner (no extra script file needed):
+---
+
+### (Optional) Convert JSON → CSV
+
 ```bash
 python - <<'PY'
 import json, pandas as pd, os
 inp="datasets/CoT/NAVIGATION_DATASET.json"; out="datasets/CoT/NAVIGATION_DATASET.csv"
-j=json.load(open(inp,"r",encoding="utf-8")); df=pd.DataFrame(j)
+data=json.load(open(inp,"r",encoding="utf-8"))
+df=pd.DataFrame(data)
 if "question" in df.columns: df=df.rename(columns={"question":"Question"})
-os.makedirs(os.path.dirname(out), exist_ok=True); df.to_csv(out, index=False, encoding="utf-8")
-print("Wrote", out)
+os.makedirs(os.path.dirname(out), exist_ok=True)
+df.to_csv(out, index=False, encoding="utf-8")
+print("Saved", out)
 PY
 ```
 
 ---
 
-## 3) (Optional) Improve targets with LLM and apply them
-`utils/paraphrase.py` can produce **`target_variations.csv`** with refined Objectives/targets.  
-This file is **not used automatically** by the pipeline.
+## 3. Enhance Targets with LLM (Optional)
 
-To apply it, use **`modify_target.py`** (provided here). It supports both YAML templates and dataset JSON.
+You may refine the **Objective/target** terms using `utils/paraphrase.py`.  
+This creates `target_variations.csv`, which can be applied to YAML or JSON via `modify_target.py`.
 
-### Update YAML templates
+### Apply to YAML templates
 ```bash
-python modify_target.py   --csv target_variations.csv   --in utils/useful_cot.yaml   --out utils/useful_cot.improved.yaml   --pick first
+python modify_target.py --csv target_variations.csv \
+  --in utils/useful_cot.yaml --out utils/useful_cot.improved.yaml --pick first
 ```
 
-### Update a dataset JSON
+### Apply to dataset JSON
 ```bash
-python modify_target.py   --csv target_variations.csv   --in datasets/CoT/NAVIGATION_DATASET.json   --out datasets/CoT/NAVIGATION_DATASET.improved.json   --pick longest
+python modify_target.py --csv target_variations.csv \
+  --in datasets/CoT/NAVIGATION_DATASET.json \
+  --out datasets/CoT/NAVIGATION_DATASET.improved.json \
+  --pick longest
 ```
-
-Flags:
-- `--pick {first,longest}`: choose which entry to keep when `Variations` has multiple items separated by `;`
-- `--dry-run`: preview changes without writing
-- `--no-backup`: disable automatic `.bak` backup if `--out` already exists
 
 ---
 
-## 4) Create per‑section train/val/test splits
+## 4. Create Train/Val/Test Splits
+
 Script: `datasets/create_dataset_splits.py`  
 Inputs:
-- CSV with **`Question`** column (e.g., `datasets/CoT/NAVIGATION_DATASET.csv`)
-- Per‑section JSON (e.g., `datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json`)
+- CSV dataset (`Question` column required)
+- Section mapping JSON
 
 Outputs:
-- `datasets/CoT/COMPLETE/train_dataset.csv`
-- `datasets/CoT/COMPLETE/val_dataset.csv`
-- `datasets/CoT/COMPLETE/test_dataset.csv`
+```
+datasets/CoT/COMPLETE/train_dataset.csv
+datasets/CoT/COMPLETE/val_dataset.csv
+datasets/CoT/COMPLETE/test_dataset.csv
+```
 
-Run:
+Example:
 ```bash
-python datasets/create_dataset_splits.py   --csv datasets/CoT/NAVIGATION_DATASET.csv   --json datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json   --out datasets/CoT/COMPLETE   --train 0.80 --val 0.05 --test 0.15   --seed 42
+python datasets/create_dataset_splits.py \
+  --csv datasets/CoT/NAVIGATION_DATASET.csv \
+  --json datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json \
+  --out datasets/CoT/COMPLETE \
+  --train 0.80 --val 0.05 --test 0.15 --seed 42
 ```
 
 ---
 
-## 5) Train (LoRA SFT, Unsloth + TRL)
-Script: `train_titan.py` (provided here). Default expects the **SMARTER** split directory:
+## 5. Train the Path-Planner (LoRA SFT)
+
+Script: `train_titan.py` — fine-tunes an LLM (e.g., Phi-3.5, LLaMA, Qwen) using LoRA adapters.
+
+Dataset directory structure:
 ```
-SMARTER_COMPLETE_DATASET/
+TITAN_COMPLETE_DATASET/
   ├─ train_dataset.csv
   ├─ val_dataset.csv
   └─ test_dataset.csv
@@ -143,80 +183,89 @@ SMARTER_COMPLETE_DATASET/
 
 Example:
 ```bash
-python train_titan.py   --data SMARTER_COMPLETE_DATASET   --out MODELS/phi_smarter   --model unsloth/Phi-3.5-mini-instruct   --lr 3e-4 --train-bsz 8 --eval-bsz 8 --grad-accum 2   --epochs 8 --seq-len 2048 --seed 42
+python train_titan.py \
+  --data TITAN_COMPLETE_DATASET \
+  --out MODELS/phi_titan \
+  --model unsloth/Phi-3.5-mini-instruct \
+  --lr 3e-4 --train-bsz 8 --eval-bsz 8 --grad-accum 2 \
+  --epochs 8 --seq-len 2048 --seed 42
 ```
 
-Key points:
-- Saves **LoRA adapters** + tokenizer into `--out`
-- If you hit OOM: reduce `--train-bsz` or increase `--grad-accum`
+> This script saves LoRA adapters and tokenizer into the `--out` directory.  
+> Reduce `--train-bsz` or increase `--grad-accum` if GPU memory is insufficient.
 
 ---
 
-## 6) Interactive test
-Script: `test_titan.py` (provided here). It loads the trained adapters, generates a `<PATH>...</PATH>` plan, parses entities, and executes the path on the graph via `graph_algorithm.py`.
+## 6. Interactive Testing and Graph Execution
+
+Script: `test_titan.py`  
+Loads the trained model, generates an executable `<PATH>...</PATH>` plan, and executes it over the TITAN Graph.
 
 ```bash
-python test_titan.py   --model MODELS/phi_smarter   --names NAMES.txt   --graph stix_graph_correct.graphml   --rels Relationship_Descriptions.txt
+python test_titan.py \
+  --model MODELS/phi_titan \
+  --names NAMES.txt \
+  --graph titan_graph.graphml \
+  --rels Relationship_Descriptions.txt
 ```
 
-Type a query, for example:
+Example query:
 ```
-what are the different kill chain phases between Carberp and Lucifer?
+Which mitigations apply to techniques used by the Carberp malware?
 ```
 
----
-
-## Embed the TITAN image in this README
-If your image is at `images/titan.png`, this is already set at the top of the README.  
-Alternative Markdown syntax:
-```markdown
-![TITAN framework](images/titan.png)
-```
-Centered and resized (HTML):
-```html
-<p align="center">
-  <img src="images/titan.png" alt="TITAN framework" width="600">
-</p>
-```
+The system generates a CoT reasoning trace, an executable path, and the final grounded entities.
 
 ---
 
 ## Troubleshooting
-- **Missing `Question` column**: rename `question` to `Question` before splitting (see JSON→CSV helper).
-- **Unmapped questions**: they may be dropped or set to `Unknown`, depending on your splitter logic.
-- **Tiny sections**: the splitter handles small groups gracefully (1 row → train; 2 rows → 50/50 train/test).
-- **LLM GPU/CPU**: if you don’t have a GPU, training will be slow. For `paraphrase.py`, set `device_map="cpu"` if needed.
-- **Paths**: if scripts don’t accept CLI args in your version, configure paths inside the files.
+
+- **Missing columns** — rename `question` → `Question` before splitting.  
+- **Unknown mappings** — may be excluded or labeled as `Unknown`.  
+- **Small sections** — the splitter balances small groups automatically.  
+- **GPU unavailable** — training runs on CPU but will be slow.  
+- **CLI arguments not supported** — set paths directly in scripts.
 
 ---
 
-## Quick pipeline (CoT)
+## Quick CoT Pipeline Example
 ```bash
-# 1) Build graph
-python utils/build_graph.py --base ../attack-stix-data --out stix_graph_correct.graphml
+# 1. Build graph
+python utils/build_graph.py --base ../attack-stix-data --out titan_graph.graphml
 
-# 2) Build dataset (json + per-section)
-python utils/build_dataset.py   --templates utils/useful_cot.yaml   --graph stix_graph_correct.graphml   --out datasets/CoT/NAVIGATION_DATASET.json   --out datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json
+# 2. Build dataset
+python utils/build_dataset.py \
+  --templates utils/useful_cot.yaml \
+  --graph titan_graph.graphml \
+  --out datasets/CoT/NAVIGATION_DATASET.json \
+  --out datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json
 
-# 3) (optional) apply LLM targets
-python modify_target.py   --csv target_variations.csv   --in datasets/CoT/NAVIGATION_DATASET.json   --out datasets/CoT/NAVIGATION_DATASET.improved.json
+# 3. (Optional) Apply paraphrased targets
+python modify_target.py --csv target_variations.csv \
+  --in datasets/CoT/NAVIGATION_DATASET.json \
+  --out datasets/CoT/NAVIGATION_DATASET.improved.json
 
-# 4) Convert to CSV (if needed)
+# 4. Convert to CSV
 python - <<'PY'
 import json, pandas as pd, os
 inp="datasets/CoT/NAVIGATION_DATASET.json"; out="datasets/CoT/NAVIGATION_DATASET.csv"
-j=json.load(open(inp,"r",encoding="utf-8")); df=pd.DataFrame(j)
+data=json.load(open(inp,"r",encoding="utf-8")); df=pd.DataFrame(data)
 if "question" in df.columns: df=df.rename(columns={"question":"Question"})
 os.makedirs(os.path.dirname(out), exist_ok=True); df.to_csv(out, index=False, encoding="utf-8")
-print("Wrote", out)
+print("Saved", out)
 PY
 
-# 5) Split
-python datasets/create_dataset_splits.py   --csv datasets/CoT/NAVIGATION_DATASET.csv   --json datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json   --out datasets/CoT/COMPLETE --train 0.80 --val 0.05 --test 0.15
+# 5. Split
+python datasets/create_dataset_splits.py \
+  --csv datasets/CoT/NAVIGATION_DATASET.csv \
+  --json datasets/CoT/NAVIGATION_QUESTION_PER_SECTION.json \
+  --out datasets/CoT/COMPLETE --train 0.80 --val 0.05 --test 0.15
 
-# 6) Train
-python train_titan.py --data SMARTER_COMPLETE_DATASET --out MODELS/phi_smarter
+# 6. Train
+python train_titan.py --data TITAN_COMPLETE_DATASET --out MODELS/phi_titan
 
-# 7) Test
-python test_titan.py --model MODELS/phi_smarter --names NAMES.txt --graph stix_graph_correct.graphml --rels Relationship_Descriptions.txt
+# 7. Test
+python test_titan.py --model MODELS/phi_titan --names NAMES.txt --graph titan_graph.graphml --rels Relationship_Descriptions.txt
 ```
+
+
