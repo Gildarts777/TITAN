@@ -30,7 +30,7 @@ TITAN is a **typed, bidirectional knowledge graph framework** for **Cyber Threat
 <!-- In alternativa: opzione B (URL RAW assoluto, più robusta) -->
 <!--
 <video controls width="720" muted loop playsinline>
-  <source src="https://raw.githubusercontent.com/cti-graph-reasoner/TITAN/tree/main/assets" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/cti-graph-reasoner/TITAN/tree/main/assets/graph1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 -->
