@@ -20,12 +20,7 @@
 
 TITAN is a **typed, bidirectional knowledge graph framework** for **Cyber Threat Intelligence (CTI)** reasoning and **question answering**. It integrates data from the **MITRE ATT&CK STIX** bundles, builds a **TITAN Ontology**, generates **reasoning (CoT)** and **non-reasoning (NoCoT)** datasets, and provides an **end-to-end pipeline** for model training, evaluation, and graph execution.
 
-▶️ [Apri il video RAW](https://raw.githubusercontent.com/cti-graph-reasoner/TITAN/main/assets/graph1.mp4)
-<!-- ✅ Funziona su GitHub README -->
-<video src="https://raw.githubusercontent.com/cti-graph-reasoner/TITAN/main/assets/graph1.mp4"
-       controls width="720" muted loop playsinline>
-  Your browser does not support the video tag.
-</video>
+![Demo](images/demo1.gif)  <!-- o images/demo1.gif -->
 
 
 ---
