@@ -1,4 +1,4 @@
-<h1 align="center">🚀 TITAN — <i>Threat Intelligence Through Automated Navigation</i></h1>
+<h1 align="center">TITAN - <i>Threat Intelligence Through Automated Navigation</i></h1>
 
 <p align="center">
   <b>A Typed & Interpretable Framework for Cyber Threat Intelligence Reasoning</b><br>
@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="images/TITAN.png" alt="TITAN Framework" width="70%">
+  <img src="images/TITAN.png" alt="TITAN Framework" width="60%">
 </p>
 
 <p align="center">
