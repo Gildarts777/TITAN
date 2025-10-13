@@ -24,28 +24,28 @@ TITAN is a **typed, bidirectional knowledge graph framework** for **Cyber Threat
 
 <p align="center">
   <a href="images/demo1.gif">
-    <img src="images/demo1.gif" alt="TITAN with Chain of Thought (CoT)" width="70%" loading="lazy">
+    <img src="images/demo1.gif" alt="TITAN with Chain of Thought (CoT)" width="85%" loading="lazy">
   </a><br>
   <sub>TITAN with Chain of Thought (CoT)</sub>
 </p>
 
 <p align="center">
   <a href="images/demo1.gif">
-    <img src="images/demo1.gif" alt="No Chain of Thought (Example 1)" width="70%" loading="lazy">
+    <img src="images/demo1.gif" alt="No Chain of Thought (Example 1)" width="85%" loading="lazy">
   </a><br>
   <sub>No Chain of Thought (Example 1)</sub>
 </p>
 
 <p align="center">
   <a href="images/demo2.gif">
-    <img src="images/demo2.gif" alt="No Chain of Thought (Example 2)" width="70%" loading="lazy">
+    <img src="images/demo2.gif" alt="No Chain of Thought (Example 2)" width="85%" loading="lazy">
   </a><br>
   <sub>No Chain of Thought (Example 2)</sub>
 </p>
 
 <p align="center">
   <a href="images/demo4.gif">
-    <img src="images/demo4.gif" alt="No Chain of Thought (Example 1)" width="70%" loading="lazy">
+    <img src="images/demo4.gif" alt="No Chain of Thought (Example 1)" width="85%" loading="lazy">
   </a><br>
   <sub>TITAN as a tool for a Cybersecurity Agent</sub>
 </p>
