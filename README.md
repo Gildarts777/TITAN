@@ -23,8 +23,8 @@ TITAN is a **typed, bidirectional knowledge graph framework** for **Cyber Threat
 <h3 align="center">🎬 Demos</h3>
 
 <p align="center">
-  <a href="images/demo4.gif">
-    <img src="images/demo4.gif" alt="TITAN with Chain of Thought (CoT)" width="85%" loading="lazy">
+  <a href="images/demo3.gif">
+    <img src="images/demo3.gif" alt="TITAN with Chain of Thought (CoT)" width="85%" loading="lazy">
   </a><br>
   <sub>TITAN with Chain of Thought (CoT)</sub>
 </p>
