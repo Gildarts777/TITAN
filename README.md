@@ -1,4 +1,22 @@
-# TITAN — Threat Intelligence Through Automated Navigation
+<h1 align="center">🚀 TITAN — <i>Threat Intelligence Through Automated Navigation</i></h1>
+
+<p align="center">
+  <b>A Typed & Interpretable Framework for Cyber Threat Intelligence Reasoning</b><br>
+  <sub>Bridging MITRE ATT&CK, Knowledge Graphs, and Large Language Models</sub>
+</p>
+
+<p align="center">
+  <img src="images/TITAN.png" alt="TITAN Framework" width="70%">
+</p>
+
+<p align="center">
+  <a href="#overview"><img src="https://img.shields.io/badge/Framework-Typed%20CTI%20Graph-blueviolet?style=for-the-badge"></a>
+  <a href="#pipeline"><img src="https://img.shields.io/badge/Pipeline-End--to--End-brightgreen?style=for-the-badge"></a>
+  <a href="#datasets"><img src="https://img.shields.io/badge/Datasets-CoT%20%26%20NoCoT-orange?style=for-the-badge"></a>
+  <a href="#training"><img src="https://img.shields.io/badge/LLM-LoRA%20%2B%20TRL-red?style=for-the-badge"></a>
+</p>
+
+---
 
 TITAN is a **typed, bidirectional knowledge graph framework** for **Cyber Threat Intelligence (CTI)** reasoning and **question answering**.  
 It integrates data from the **MITRE ATT&CK STIX** bundles, builds a **TITAN Ontology**, generates **reasoning (CoT)** and **non-reasoning (NoCoT)** datasets, and provides an **end-to-end pipeline** for model training, evaluation, and graph execution.
