@@ -1,0 +1,78 @@
+{
+  "train": {
+    "rows": 65529,
+    "executable": 34408,
+    "executable_rate": 0.5250804987104946,
+    "by_section": {
+      "common_and_differences": 0.441,
+      "double_entity": 1.0,
+      "entity_in_path": 0.514,
+      "intra_relationship": 0.723,
+      "multi_hop_relationship": 0.437,
+      "multi_with_more_filter": 0.002,
+      "multifilter": 0.654,
+      "multihop_no_entity": 0.929,
+      "multihop_one_entity_filter": 0.199,
+      "other_double_entity": 1.0,
+      "single_hop_not_filter": 0.535,
+      "single_hop_relationship_filter": 0.549
+    }
+  },
+  "val": {
+    "rows": 3855,
+    "executable": 2009,
+    "executable_rate": 0.5211413748378729,
+    "by_section": {
+      "common_and_differences": 0.458,
+      "double_entity": 1.0,
+      "entity_in_path": 0.441,
+      "intra_relationship": 0.724,
+      "multi_hop_relationship": 0.436,
+      "multi_with_more_filter": 0.0,
+      "multifilter": 0.5,
+      "multihop_no_entity": 0.857,
+      "multihop_one_entity_filter": 0.194,
+      "other_double_entity": 1.0,
+      "single_hop_not_filter": 0.524,
+      "single_hop_relationship_filter": 0.551
+    }
+  },
+  "test_iid": {
+    "rows": 7702,
+    "executable": 4012,
+    "executable_rate": 0.5209036613866528,
+    "by_section": {
+      "common_and_differences": 0.438,
+      "double_entity": 1.0,
+      "entity_in_path": 0.478,
+      "intra_relationship": 0.709,
+      "multi_hop_relationship": 0.439,
+      "multi_with_more_filter": 0.0,
+      "multifilter": 1.0,
+      "multihop_no_entity": 0.952,
+      "multihop_one_entity_filter": 0.205,
+      "other_double_entity": 1.0,
+      "single_hop_not_filter": 0.521,
+      "single_hop_relationship_filter": 0.562
+    }
+  },
+  "test_heldout": {
+    "rows": 15627,
+    "executable": 6959,
+    "executable_rate": 0.44531899916810647,
+    "by_section": {
+      "common_and_differences": 0.94,
+      "double_entity": 1.0,
+      "entity_in_path": 0.378,
+      "intra_relationship": 0.362,
+      "multi_hop_relationship": 0.317,
+      "multi_with_more_filter": 0.0,
+      "multifilter": 0.75,
+      "multihop_no_entity": 0.75,
+      "multihop_one_entity_filter": 0.047,
+      "other_double_entity": 0.976,
+      "single_hop_not_filter": 0.896,
+      "single_hop_relationship_filter": 0.562
+    }
+  }
+}

@@ -1,0 +1,19 @@
+# Trained model artifacts (kept local; too large / not for distribution)
+MODELS/
+
+# Python environments & caches
+.venv/
+.venv-vllm/
+__pycache__/
+unsloth_compiled_cache/
+
+# Run logs (noisy, machine-specific)
+logs_*.log
+
+# Local-only working material — NOT for the public repo:
+# confidential peer reviews, non-anonymous paper draft, venue planning,
+# internal session notes
+Review TITAN.txt
+TITAN_paper-1.pdf
+EACL topic 2027.txt
+session_log/

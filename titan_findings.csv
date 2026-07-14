@@ -1,0 +1,209 @@
+category,metric,subgroup,value,notes
+paper_audit,template_count_claimed,paper text,700,Paper states 'more than 700 question templates'
+paper_audit,template_count_actual,utils/useful_cot.yaml,454,grep -c '^\s*- question:' on the YAML; 467 path: entries (some paths reused across question variants)
+leakage_original_split,test_rows_sharing_template_with_train,"CoT, select-args stripped",13931/13931 = 100.0%,Every original test row's normalized path (Section+path with select args stripped) also occurs in train
+leakage_original_split,test_rows_sharing_template_with_train,"CoT, select+filter-args stripped",13931/13931 = 100.0%,
+leakage_original_split,distinct_templates,train (select-stripped),298,
+leakage_original_split,distinct_templates,test (select-stripped),274,All 274 also present in train
+leakage_original_split,exact_question_string_overlap,test rows verbatim in train,34/13931 = 0.24%,
+leakage_original_split,CoT_vs_NoCoT_question_overlap,train,7789/74165 = 10.5%,CoT and NoCoT paper datasets were drawn from different paraphrase samples of the same templates -- not the same underlying questions
+leakage_original_split,CoT_vs_NoCoT_question_overlap,test,1478/13927 = 10.6%,
+new_split_summary,rows,train,65529,
+new_split_summary,distinct_templates,train,228,
+new_split_sections,rows[train],multi_hop_relationship,21275,
+new_split_sections,rows[train],intra_relationship,16419,
+new_split_sections,rows[train],single_hop_not_filter,12575,
+new_split_sections,rows[train],single_hop_relationship_filter,7155,
+new_split_sections,rows[train],multihop_one_entity_filter,5176,
+new_split_sections,rows[train],entity_in_path,1159,
+new_split_sections,rows[train],multi_with_more_filter,556,
+new_split_sections,rows[train],common_and_differences,408,
+new_split_sections,rows[train],multihop_no_entity,354,
+new_split_sections,rows[train],other_double_entity,298,
+new_split_sections,rows[train],double_entity,128,
+new_split_sections,rows[train],multifilter,26,
+new_split_path_length,rows[train],length=1,27048,
+new_split_path_length,rows[train],length=2,26247,
+new_split_path_length,rows[train],length=3,6535,
+new_split_path_length,rows[train],length=4,4003,
+new_split_path_length,rows[train],length=5,994,
+new_split_path_length,rows[train],length=6,695,
+new_split_path_length,rows[train],length=7,7,
+new_split_operators,rows[train],filter,18634,
+new_split_operators,rows[train],select,951,
+new_split_operators,rows[train],exec_common,1336,
+new_split_operators,rows[train],exec_difference,176,
+new_split_summary,rows,val,3855,
+new_split_summary,distinct_templates,val,186,
+new_split_sections,rows[val],multi_hop_relationship,1250,
+new_split_sections,rows[val],intra_relationship,966,
+new_split_sections,rows[val],single_hop_not_filter,740,
+new_split_sections,rows[val],single_hop_relationship_filter,421,
+new_split_sections,rows[val],multihop_one_entity_filter,304,
+new_split_sections,rows[val],entity_in_path,68,
+new_split_sections,rows[val],multi_with_more_filter,33,
+new_split_sections,rows[val],common_and_differences,24,
+new_split_sections,rows[val],multihop_no_entity,21,
+new_split_sections,rows[val],other_double_entity,18,
+new_split_sections,rows[val],double_entity,8,
+new_split_sections,rows[val],multifilter,2,
+new_split_path_length,rows[val],length=1,1619,
+new_split_path_length,rows[val],length=2,1490,
+new_split_path_length,rows[val],length=3,411,
+new_split_path_length,rows[val],length=4,238,
+new_split_path_length,rows[val],length=5,58,
+new_split_path_length,rows[val],length=6,38,
+new_split_path_length,rows[val],length=7,1,
+new_split_operators,rows[val],filter,1091,
+new_split_operators,rows[val],select,56,
+new_split_operators,rows[val],exec_common,80,
+new_split_operators,rows[val],exec_difference,9,
+new_split_summary,rows,test_iid,7702,
+new_split_summary,distinct_templates,test_iid,197,
+new_split_sections,rows[test_iid],multi_hop_relationship,2499,
+new_split_sections,rows[test_iid],intra_relationship,1931,
+new_split_sections,rows[test_iid],single_hop_not_filter,1479,
+new_split_sections,rows[test_iid],single_hop_relationship_filter,842,
+new_split_sections,rows[test_iid],multihop_one_entity_filter,610,
+new_split_sections,rows[test_iid],entity_in_path,136,
+new_split_sections,rows[test_iid],multi_with_more_filter,65,
+new_split_sections,rows[test_iid],common_and_differences,48,
+new_split_sections,rows[test_iid],multihop_no_entity,42,
+new_split_sections,rows[test_iid],other_double_entity,34,
+new_split_sections,rows[test_iid],double_entity,14,
+new_split_sections,rows[test_iid],multifilter,2,
+new_split_path_length,rows[test_iid],length=1,3134,
+new_split_path_length,rows[test_iid],length=2,3128,
+new_split_path_length,rows[test_iid],length=3,783,
+new_split_path_length,rows[test_iid],length=4,467,
+new_split_path_length,rows[test_iid],length=5,109,
+new_split_path_length,rows[test_iid],length=6,79,
+new_split_path_length,rows[test_iid],length=7,2,
+new_split_operators,rows[test_iid],filter,2166,
+new_split_operators,rows[test_iid],select,106,
+new_split_operators,rows[test_iid],exec_common,160,
+new_split_operators,rows[test_iid],exec_difference,16,
+new_split_summary,rows,test_heldout,15627,
+new_split_summary,distinct_templates,test_heldout,70,
+new_split_sections,rows[test_heldout],multi_hop_relationship,4790,
+new_split_sections,rows[test_heldout],intra_relationship,4734,
+new_split_sections,rows[test_heldout],single_hop_not_filter,2641,
+new_split_sections,rows[test_heldout],single_hop_relationship_filter,1639,
+new_split_sections,rows[test_heldout],multihop_one_entity_filter,1101,
+new_split_sections,rows[test_heldout],entity_in_path,251,
+new_split_sections,rows[test_heldout],multi_with_more_filter,153,
+new_split_sections,rows[test_heldout],common_and_differences,100,
+new_split_sections,rows[test_heldout],other_double_entity,84,
+new_split_sections,rows[test_heldout],multihop_no_entity,80,
+new_split_sections,rows[test_heldout],double_entity,50,
+new_split_sections,rows[test_heldout],multifilter,4,
+new_split_path_length,rows[test_heldout],length=1,5984,
+new_split_path_length,rows[test_heldout],length=2,5425,
+new_split_path_length,rows[test_heldout],length=3,1732,
+new_split_path_length,rows[test_heldout],length=4,1956,
+new_split_path_length,rows[test_heldout],length=5,381,
+new_split_path_length,rows[test_heldout],length=6,149,
+new_split_operators,rows[test_heldout],filter,4599,
+new_split_operators,rows[test_heldout],select,485,
+new_split_operators,rows[test_heldout],exec_common,44,
+new_split_operators,rows[test_heldout],exec_difference,150,
+new_split_summary,skeleton_unseen_rows,test_heldout,7859,Subset of test_heldout whose relation skeleton (paths with filter args also stripped) was never seen in train -- the hardest generalization slice
+new_split_guarantees,template_overlap_heldout_vs_rest,verified independently,0,Re-derived TemplateKey from raw Path text in the written CSVs; zero overlap between test_heldout and train/val/test_iid
+new_split_guarantees,exact_question_overlap_vs_train,val/test_iid/test_heldout,0,
+new_split_guarantees,skeleton_overlap_for_SkeletonUnseen_rows,vs train,0,
+new_split_guarantees,CoT_NoCoT_row_alignment,same Question + same final Path per row,True,Fixes the ~10% overlap problem above: CoT and NoCoT models will now be trained/evaluated on identical questions
+gold_executability,executable_rate,train,52.5%,34408/65529 gold reference paths retrieve a non-empty answer set
+gold_executability_by_section,executable_rate[train],common_and_differences,0.441,
+gold_executability_by_section,executable_rate[train],double_entity,1.0,
+gold_executability_by_section,executable_rate[train],entity_in_path,0.514,
+gold_executability_by_section,executable_rate[train],intra_relationship,0.723,
+gold_executability_by_section,executable_rate[train],multi_hop_relationship,0.437,
+gold_executability_by_section,executable_rate[train],multi_with_more_filter,0.002,
+gold_executability_by_section,executable_rate[train],multifilter,0.654,
+gold_executability_by_section,executable_rate[train],multihop_no_entity,0.929,
+gold_executability_by_section,executable_rate[train],multihop_one_entity_filter,0.199,
+gold_executability_by_section,executable_rate[train],other_double_entity,1.0,
+gold_executability_by_section,executable_rate[train],single_hop_not_filter,0.535,
+gold_executability_by_section,executable_rate[train],single_hop_relationship_filter,0.549,
+gold_executability,executable_rate,val,52.1%,2009/3855 gold reference paths retrieve a non-empty answer set
+gold_executability_by_section,executable_rate[val],common_and_differences,0.458,
+gold_executability_by_section,executable_rate[val],double_entity,1.0,
+gold_executability_by_section,executable_rate[val],entity_in_path,0.441,
+gold_executability_by_section,executable_rate[val],intra_relationship,0.724,
+gold_executability_by_section,executable_rate[val],multi_hop_relationship,0.436,
+gold_executability_by_section,executable_rate[val],multi_with_more_filter,0.0,
+gold_executability_by_section,executable_rate[val],multifilter,0.5,
+gold_executability_by_section,executable_rate[val],multihop_no_entity,0.857,
+gold_executability_by_section,executable_rate[val],multihop_one_entity_filter,0.194,
+gold_executability_by_section,executable_rate[val],other_double_entity,1.0,
+gold_executability_by_section,executable_rate[val],single_hop_not_filter,0.524,
+gold_executability_by_section,executable_rate[val],single_hop_relationship_filter,0.551,
+gold_executability,executable_rate,test_iid,52.1%,4012/7702 gold reference paths retrieve a non-empty answer set
+gold_executability_by_section,executable_rate[test_iid],common_and_differences,0.438,
+gold_executability_by_section,executable_rate[test_iid],double_entity,1.0,
+gold_executability_by_section,executable_rate[test_iid],entity_in_path,0.478,
+gold_executability_by_section,executable_rate[test_iid],intra_relationship,0.709,
+gold_executability_by_section,executable_rate[test_iid],multi_hop_relationship,0.439,
+gold_executability_by_section,executable_rate[test_iid],multi_with_more_filter,0.0,
+gold_executability_by_section,executable_rate[test_iid],multifilter,1.0,
+gold_executability_by_section,executable_rate[test_iid],multihop_no_entity,0.952,
+gold_executability_by_section,executable_rate[test_iid],multihop_one_entity_filter,0.205,
+gold_executability_by_section,executable_rate[test_iid],other_double_entity,1.0,
+gold_executability_by_section,executable_rate[test_iid],single_hop_not_filter,0.521,
+gold_executability_by_section,executable_rate[test_iid],single_hop_relationship_filter,0.562,
+gold_executability,executable_rate,test_heldout,44.5%,6959/15627 gold reference paths retrieve a non-empty answer set
+gold_executability_by_section,executable_rate[test_heldout],common_and_differences,0.94,
+gold_executability_by_section,executable_rate[test_heldout],double_entity,1.0,
+gold_executability_by_section,executable_rate[test_heldout],entity_in_path,0.378,
+gold_executability_by_section,executable_rate[test_heldout],intra_relationship,0.362,
+gold_executability_by_section,executable_rate[test_heldout],multi_hop_relationship,0.317,
+gold_executability_by_section,executable_rate[test_heldout],multi_with_more_filter,0.0,
+gold_executability_by_section,executable_rate[test_heldout],multifilter,0.75,
+gold_executability_by_section,executable_rate[test_heldout],multihop_no_entity,0.75,
+gold_executability_by_section,executable_rate[test_heldout],multihop_one_entity_filter,0.047,
+gold_executability_by_section,executable_rate[test_heldout],other_double_entity,0.976,
+gold_executability_by_section,executable_rate[test_heldout],single_hop_not_filter,0.896,
+gold_executability_by_section,executable_rate[test_heldout],single_hop_relationship_filter,0.562,
+gold_executability,overall_dataset_validity,"all 92,713 deduped rows",~52%,"~Half of the auto-generated dataset asks a question whose gold answer, per the ontology's own edges, is empty -- e.g. 'What security protocols are bypassed by Resource Hijacking?' has gold path x_mitre_defense_bypassed but that node has no such edge. Not caught by build_dataset.py; only surfaced by executing paths."
+gold_executability,worst_section,multi_with_more_filter,~0% executable,Near-total invalidity in train/val/test_iid
+gold_executability,worst_section_2,multihop_one_entity_filter,~20% executable (5-20% across splits),
+second_order_NoCoT_robustness,n_examples,overall,13930,"Paraphrased ('Variation 2') versions of the original 13,951 test questions; predictions were already computed and stored in datasets/NoCoT/second_order_results_NoCoT.json, only the entity-level scoring was missing"
+second_order_NoCoT_robustness,path_EM,overall,0.536,"95% CI [0.528, 0.545]; cross-checked against the repo's own stored is_path_correct labels (0.5346) -- matches"
+second_order_NoCoT_robustness,entity_F1,overall,0.518,"95% CI [0.506, 0.529] -- new metric, not previously computed anywhere in the repo"
+second_order_NoCoT_robustness,well_formed_rate,overall,1.000,
+second_order_NoCoT_robustness,gold_executable_rate,overall,0.510,
+second_order_NoCoT_robustness,pred_nonempty_rate,overall,0.404,
+second_order_NoCoT_by_length,path_EM,L1,0.543,n=5657
+second_order_NoCoT_by_length,entity_F1,L1,0.529,n=5657
+second_order_NoCoT_by_length,path_EM,L2,0.532,n=5438
+second_order_NoCoT_by_length,entity_F1,L2,0.511,n=5438
+second_order_NoCoT_by_length,path_EM,L3,0.523,n=1423
+second_order_NoCoT_by_length,entity_F1,L3,0.384,n=1423
+second_order_NoCoT_by_length,path_EM,L4+,0.543,n=1412
+second_order_NoCoT_by_length,entity_F1,L4+,0.577,n=1412
+second_order_NoCoT_by_operator,path_EM,exec_common,0.232,n=241
+second_order_NoCoT_by_operator,entity_F1,exec_common,exec_common,n=241
+second_order_NoCoT_by_operator,gold_executable_rate,exec_common,0.519,n=241
+second_order_NoCoT_by_operator,path_EM,exec_difference,0.421,n=57
+second_order_NoCoT_by_operator,entity_F1,exec_difference,exec_difference,n=57
+second_order_NoCoT_by_operator,gold_executable_rate,exec_difference,0.474,n=57
+second_order_NoCoT_by_operator,path_EM,filter,0.661,n=3771
+second_order_NoCoT_by_operator,entity_F1,filter,filter,n=3771
+second_order_NoCoT_by_operator,gold_executable_rate,filter,0.148,n=3771
+second_order_NoCoT_by_operator,path_EM,plain,0.495,n=9733
+second_order_NoCoT_by_operator,entity_F1,plain,plain,n=9733
+second_order_NoCoT_by_operator,gold_executable_rate,plain,0.645,n=9733
+second_order_NoCoT_by_operator,path_EM,select,0.609,n=128
+second_order_NoCoT_by_operator,entity_F1,select,select,n=128
+second_order_NoCoT_by_operator,gold_executable_rate,select,0.891,n=128
+second_order_NoCoT_robustness,notable_divergence,L3 bucket,path_EM=0.523 but entity_F1=0.384,Path-EM and answer correctness diverge sharply at depth 3 -- confirms Reviewer 3's 'path correctness is a proxy but not sufficient' concern with data
+second_order_NoCoT_robustness,notable_divergence,filter bucket,path_EM=0.661 (highest) but only 14.8% of filter questions are gold-executable,"Model looks best exactly where questions are most often unanswerable -- a dataset-validity artifact, not a model strength"
+code_audit,missing_component,evaluation code,absent from repo,No script anywhere computes Path Accuracy / ROUGE / BLEU / BERTScore as reported in the paper's Fig. 4 -- built from scratch as evaluate_titan.py
+code_audit,bug,graph_algorithm.py:follow_graph_n_entities,exec_common/exec_difference result not returned,Computes the set-combined answer for those steps but only appends it to a printable log; the actual node set is unrecoverable programmatically. Reimplemented correctly in evaluate_titan.py:execute_path()
+code_audit,fragility,test.py:extract_entities_from_output,brittle string-matching on exact CoT phrasing,"Entity extraction from generated text depends on literal substrings like ""Let's reason step by step, starting from the entity""; any phrasing drift breaks it silently"
+code_audit,fragility,test.py / graph_algorithm.py entity resolution,"SequenceMatcher fuzzy match, fixed threshold=0.5, no fallback reported",
+code_audit,split_bug,datasets/create_dataset_splits.py,row-level random split within each section,"Root cause of the 100% template leakage above; produces per-question, not per-template, train/test partitioning"
+code_audit,checkpoints,MODELS/ directory,not present in repo,Trained Phi-3.5 CoT/NoCoT adapters referenced in the paper are not saved locally; retraining from scratch was required to get any model predictions
+environment,GPUs available,node,8x NVIDIA A100-PCIE-40GB,"nvidia-smi at session start, all idle"
+environment,GPUs used for retraining,restricted per user instruction,"GPU 0, 1, 2 only",
+environment,training deps present,system python,False,unsloth/trl/peft not installed; created isolated .venv per README instructions rather than modifying shared system Python
