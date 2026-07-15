@@ -67,6 +67,10 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True)
     ap.add_argument("--dump-prompt", default=None)
+    ap.add_argument("--reasoning-effort", default=None, choices=[None, "low", "medium", "high"],
+                    help="for Harmony-format reasoning models (e.g. gpt-oss): controls "
+                         "chain-of-thought verbosity via chat_template_kwargs. Leave unset "
+                         "for non-reasoning models.")
     args = ap.parse_args()
 
     rels = collect_vocabulary(args.train)
@@ -115,7 +119,10 @@ def main() -> None:
         for q in questions
     ]
 
-    outputs = llm.chat(conversations, sampling, use_tqdm=True)
+    chat_kwargs = ({"reasoning_effort": args.reasoning_effort}
+                   if args.reasoning_effort else None)
+    outputs = llm.chat(conversations, sampling, use_tqdm=True,
+                       chat_template_kwargs=chat_kwargs)
 
     results = [{"question": q, "generated_path": o.outputs[0].text.strip()}
               for q, o in zip(questions, outputs)]
