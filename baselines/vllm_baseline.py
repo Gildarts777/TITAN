@@ -39,6 +39,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fewshot_path_baseline import (  # noqa: E402
     SYSTEM_TEMPLATE,
+    SYSTEM_TEMPLATE_COT,
     collect_typed_schema,
     collect_vocabulary,
     pick_fewshot,
@@ -71,12 +72,18 @@ def main() -> None:
                     help="for Harmony-format reasoning models (e.g. gpt-oss): controls "
                          "chain-of-thought verbosity via chat_template_kwargs. Leave unset "
                          "for non-reasoning models.")
+    ap.add_argument("--cot", action="store_true",
+                    help="use the CoT-instruction system prompt (reason step by step, "
+                         "then answer) instead of the direct-answer v3 prompt -- same "
+                         "schema/shots/decoding, only the final instruction differs. For "
+                         "the {prompted x CoT/NoCoT} x {fine-tuned x CoT/NoCoT} ablation.")
     args = ap.parse_args()
 
     rels = collect_vocabulary(args.train)
     node_types, schema_lines = collect_typed_schema(args.graph, rels)
     shots = pick_fewshot(args.train, args.shots, args.seed, executable_csv=args.exec_csv)
-    system_prompt = SYSTEM_TEMPLATE.format(
+    template = SYSTEM_TEMPLATE_COT if args.cot else SYSTEM_TEMPLATE
+    system_prompt = template.format(
         node_types=", ".join(node_types),
         schema="\n".join(schema_lines),
         examples="\n".join(f"Q: {q}\nA: {p}" for q, p in shots),
@@ -86,7 +93,8 @@ def main() -> None:
     if args.dump_prompt:
         with open(args.dump_prompt, "w", encoding="utf-8") as f:
             f.write(system_prompt)
-        print(f"[OK] prompt written to {args.dump_prompt}")
+        print(f"[OK] prompt written to {args.dump_prompt} (no model loaded, exiting)")
+        return
 
     test = pd.read_csv(args.test)
     if args.sample and args.sample < len(test):

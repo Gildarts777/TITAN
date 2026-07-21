@@ -10,6 +10,11 @@ unsloth_compiled_cache/
 # Run logs (noisy, machine-specific)
 logs_*.log
 
+# Raw generation dump exceeds GitHub's 100MB hard file-size limit (DeepSeek's
+# verbose <think> traces over the full 15,627-row test set); the scored
+# results (eval_report.json / eval_per_example.csv) are tracked instead.
+baselines/deepseek_r1_70b_heldout_full_v3.json
+
 # Local-only working material — NOT for the public repo:
 # confidential peer reviews, non-anonymous paper draft, venue planning,
 # internal session notes

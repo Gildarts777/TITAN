@@ -55,6 +55,15 @@ def main() -> None:
     ap.add_argument("--max-new", type=int, default=256)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--stop-string", default="</PATH>",
+                    help="stop generation at this string (default: the DSL's closing "
+                         "tag). Pass an empty string to disable (e.g. for SPARQL "
+                         "targets, which have no single fixed terminator -- rely on "
+                         "natural EOS + --max-new instead).")
+    ap.add_argument("--field-name", default="generated_path",
+                    help="JSON key for the generated text in the output "
+                         "(evaluate_titan.py expects 'generated_path'; "
+                         "score_sparql_predictions.py expects 'generated_text')")
     args = ap.parse_args()
 
     cfg = read_adapter_config(args.adapter)
@@ -88,8 +97,9 @@ def main() -> None:
         trust_remote_code=True,
     )
     lora_request = LoRARequest("titan_adapter", 1, args.adapter)
-    sampling = SamplingParams(temperature=0.0, max_tokens=args.max_new,
-                              stop=["</PATH>"], include_stop_str_in_output=True)
+    stop_kwargs = ({"stop": [args.stop_string], "include_stop_str_in_output": True}
+                  if args.stop_string else {})
+    sampling = SamplingParams(temperature=0.0, max_tokens=args.max_new, **stop_kwargs)
 
     conversations = [
         [{"role": "system", "content": SYSTEM_PROMPT},
@@ -99,7 +109,7 @@ def main() -> None:
 
     outputs = llm.chat(conversations, sampling, use_tqdm=True, lora_request=lora_request)
 
-    results = [{"question": q, "generated_path": o.outputs[0].text.strip()}
+    results = [{"question": q, args.field_name: o.outputs[0].text.strip()}
               for q, o in zip(questions, outputs)]
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=1)

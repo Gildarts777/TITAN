@@ -102,6 +102,33 @@ def _node_names(graph) -> List[str]:
     return sorted(names, key=len, reverse=True)
 
 
+_REL_TARGET_TYPES: Optional[Dict[str, str]] = None
+
+
+def _rel_target_type(label: str) -> Optional[str]:
+    """Static per-relation dominant target type (from rel_target_types.json,
+    aggregated over ALL edges of that label in the whole graph). Used instead
+    of per-node dynamic GA._get_node_type() for exec_common/exec_difference
+    accumulation: a handful of MITRE-category names collide across node
+    types (e.g. 'Code Signing' exists as both an attack_pattern and a
+    course_of_action; see session_log/titan_findings.csv,
+    graph_construction_bug), and _get_node_type()'s neighbor-iteration-order
+    resolution silently misclassifies such nodes for a *specific* traversal
+    context. The relation being followed already tells us the intended
+    type; asking the node "what are you, generically" is the wrong
+    question here."""
+    global _REL_TARGET_TYPES
+    if _REL_TARGET_TYPES is None:
+        try:
+            with open("rel_target_types.json", "r", encoding="utf-8") as f:
+                raw = json.load(f)
+            _REL_TARGET_TYPES = {k: v.get("target_type") for k, v in raw.items()}
+        except FileNotFoundError:
+            _REL_TARGET_TYPES = {}
+    t = _REL_TARGET_TYPES.get(label)
+    return None if t in (None, "?") else t
+
+
 def parse_select_args(arg: str, names_longest_first: Sequence[str]) -> List[str]:
     """Segment 'Cannon LitePower' into known node names (greedy longest match).
     Whatever cannot be matched is kept as whitespace-split tokens."""
@@ -123,12 +150,16 @@ def parse_select_args(arg: str, names_longest_first: Sequence[str]) -> List[str]
 def _traverse(graph, current: Set[str], label: str,
               acc_by_type: Dict[Optional[str], Set[str]]) -> Set[str]:
     nxt: Set[str] = set()
+    rel_type = _rel_target_type(label)
     for node in current:
         try:
             for nb in graph.neighbors(node):
                 if graph[node][nb].get("label") == label:
                     nxt.add(nb)
-                    acc_by_type.setdefault(GA._get_node_type(graph, nb), set()).add(nb)
+                    # static per-relation type (see _rel_target_type), not
+                    # per-node dynamic GA._get_node_type -- avoids
+                    # misclassifying cross-category name-collision nodes
+                    acc_by_type.setdefault(rel_type, set()).add(nb)
         except Exception:
             continue
     return nxt
@@ -187,7 +218,15 @@ def execute_path(graph, entities: Sequence[str], steps: Sequence[str],
             acc = {"_": {}}
             continue
 
-        if "_type" in step:
+        if step.startswith("is_") and step.endswith("_type"):
+            # exact type-seed convention (is_<category>_type). NOT a plain
+            # "_type" substring check: MITRE attribute relations like
+            # x_mitre_impact_type / x_mitre_tactic_type also contain that
+            # substring and are NOT type-seeding steps -- see
+            # session_log/titan_findings.csv, executor_bug. Under the old
+            # substring check, reaching one of those after an earlier step
+            # had already emptied a branch would incorrectly RESET it to
+            # the full source set instead of correctly staying empty.
             seed = set(GA.find_type_sources(graph, step))
             for b in branches:
                 branches[b] = (branches[b] & seed) if branches[b] else set(seed)

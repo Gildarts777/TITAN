@@ -180,6 +180,15 @@ More examples:
 {examples}"""
 
 
+SYSTEM_TEMPLATE_COT = SYSTEM_TEMPLATE.replace(
+    "Respond with ONLY the path, wrapped in <PATH>...</PATH>, no explanation.",
+    "First reason step by step about which relations to follow and why (as in the "
+    "worked examples' \"Reasoning:\" lines above), THEN give the final answer wrapped "
+    "in <PATH>...</PATH> at the end of your response. Always end with the "
+    "<PATH>...</PATH> tag."
+)
+
+
 def build_messages(question: str, system_prompt: str) -> list[dict]:
     return [
         {"role": "system", "content": system_prompt},
